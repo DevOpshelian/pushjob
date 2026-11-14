@@ -52,7 +52,7 @@ Dashboards → New → Import → `dashboards/batchjob-overview.json` → pick y
 
 ## Need more?
 
-The **[Batch Job Observability Pack](GUMROAD_URL)** adds:
+The **[Batch Job Observability Pack](https://bonnyophelie.gumroad.com/l/batchjob-observability)** adds:
 
 - **PowerShell module** for Windows (5.1 and 7) — Task Scheduler ready, robocopy-style exit codes
 - **Helm chart**: Pushgateway + `PrometheusRule` + dashboard `ConfigMap`, one `helm install`
