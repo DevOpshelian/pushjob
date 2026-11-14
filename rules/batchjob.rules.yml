@@ -1,0 +1,19 @@
+groups:
+- name: batchjob.alerts
+  rules:
+  - alert: BatchJobFailed
+    expr: batchjob_success == 0
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: Batch job {{ $labels.job }} failed on {{ $labels.instance }}
+      description: Last run of {{ $labels.job }} on {{ $labels.instance }} exited with a non-zero code. The alert clears on the next successful run.
+  - alert: BatchJobStale
+    expr: (time() - batchjob_last_success_timestamp_seconds) > 1.5 * batchjob_expected_interval_seconds
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: Batch job {{ $labels.job }} has not succeeded recently on {{ $labels.instance }}
+      description: No successful run of {{ $labels.job }} for {{ $value | humanizeDuration }} (more than 1.5x its expected interval).

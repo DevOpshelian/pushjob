@@ -1,0 +1,29 @@
+name: ci
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    services:
+      pushgateway:
+        image: prom/pushgateway:v1.11.1
+        ports: ["9091:9091"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+          shellcheck -x pushjob.sh tests/e2e.sh
+      - name: promtool
+        run: |
+          curl -fsSL https://github.com/prometheus/prometheus/releases/download/v3.1.0/prometheus-3.1.0.linux-amd64.tar.gz | tar xz
+          ./prometheus-3.1.0.linux-amd64/promtool check rules rules/*.yml
+          ./prometheus-3.1.0.linux-amd64/promtool test rules tests/rules.test.yml
+      - name: dashboard JSON
+        run: jq -e '.uid and .title' dashboards/*.json
+      - name: end-to-end
+        env:
+          PUSHGATEWAY_URL: http://localhost:9091
+        run: bash tests/e2e.sh

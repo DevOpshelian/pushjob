@@ -1,0 +1,57 @@
+rule_files:
+- ../rules/batchjob.rules.yml
+evaluation_interval: 1m
+tests:
+- interval: 1m
+  input_series:
+  - series: batchjob_success{job="backup", instance="srv1"}
+    values: '0x10'
+  - series: batchjob_last_run_timestamp_seconds{job="backup", instance="srv1"}
+    values: '0x10'
+  - series: batchjob_last_success_timestamp_seconds{job="backup", instance="srv1"}
+    values: '0x10'
+  - series: batchjob_duration_seconds{job="backup", instance="srv1"}
+    values: 10x10
+  alert_rule_test:
+  - eval_time: 5m
+    alertname: BatchJobFailed
+    exp_alerts:
+    - exp_labels:
+        severity: warning
+        job: backup
+        instance: srv1
+      exp_annotations:
+        summary: Batch job backup failed on srv1
+        description: Last run of backup on srv1 exited with a non-zero code. The alert clears on the next successful run.
+- interval: 1m
+  input_series:
+  - series: batchjob_success{job="export", instance="srv2"}
+    values: 1x20
+  - series: batchjob_last_success_timestamp_seconds{job="export", instance="srv2"}
+    values: -172800x20
+  - series: batchjob_expected_interval_seconds{job="export", instance="srv2"}
+    values: 86400x20
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: BatchJobStale
+    exp_alerts:
+    - exp_labels:
+        severity: warning
+        job: export
+        instance: srv2
+      exp_annotations:
+        summary: Batch job export has not succeeded recently on srv2
+        description: No successful run of export for 2d 0h 10m 0s (more than 1.5x its expected interval).
+  - eval_time: 10m
+    alertname: BatchJobFailed
+    exp_alerts: []
+- interval: 1m
+  input_series:
+  - series: batchjob_last_success_timestamp_seconds{job="export", instance="srv3"}
+    values: -3600x20
+  - series: batchjob_expected_interval_seconds{job="export", instance="srv3"}
+    values: 86400x20
+  alert_rule_test:
+  - eval_time: 10m
+    alertname: BatchJobStale
+    exp_alerts: []
