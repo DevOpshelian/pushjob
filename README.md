@@ -17,7 +17,7 @@ export PUSHGATEWAY_URL=http://pushgateway:9091
 ## Install
 
 ```bash
-curl -fsSLO https://raw.githubusercontent.com/CHANGE_ME/pushjob/main/pushjob.sh
+curl -fsSLO https://raw.githubusercontent.com/DevOpshelian/pushjob/main/pushjob.sh
 chmod +x pushjob.sh
 ```
 
